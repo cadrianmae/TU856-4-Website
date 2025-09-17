@@ -1,0 +1,47 @@
+---
+layout: layouts/base.njk
+---
+
+<h1>{{ title or metadata.title or "Index" }}</h1>
+<p>{{ intro or "Welcome to this section." }}</p>
+
+{# Get current directory from page.inputPath #}
+
+{% set currentDir = page.inputPath | replace('/index.md', '/') %}
+
+<h2>Latest Posts</h2>
+<ul>
+	{% set count = 0 %}
+	{% set maxPosts = numberOfLatestPostsToShow or 5 %}
+	{% for post in collections.posts %}
+		{% if post.inputPath and post.inputPath.startsWith(currentDir) and post.inputPath != page.inputPath %}
+			{% if count < maxPosts %}
+				<li>
+					<a href="{{ post.url }}">{{ post.data.title }}</a>
+				</li>
+				{% set count = count + 1 %}
+			{% endif %}
+		{% endif %}
+	{% endfor %}
+</ul>
+
+{# Count more posts #}
+{% set morePosts = 0 %}
+{% for post in collections.posts %}
+	{% if post.inputPath and post.inputPath.startsWith(currentDir) and post.inputPath != page.inputPath %}
+		{% set morePosts = morePosts + 1 %}
+	{% endif %}
+{% endfor %}
+{% set morePosts = morePosts - (numberOfLatestPostsToShow or 5) %}
+{% if morePosts > 0 %}
+	<p>{{ morePosts }} more post{% if morePosts != 1 %}s{% endif %} can be found in <a href="{{ currentDir }}">the archive</a>.</p>
+{% endif %}
+
+{# Optionally, list all content pages in the current directory #}
+{#
+<ul>
+	{%- for entry in collections.all if entry.inputPath.startsWith(currentDir) %}
+		<li><a href="{{ entry.url }}"><code>{{ entry.url }}</code></a></li>
+	{%- endfor %}
+</ul>
+#}
